@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<plugin
+   id="com.snc.hackathon.snboost"
+   name="SNBoost"
+   version="1.0.0"
+   state="published"
+   help="Hackathon_SNBoost"
+   type="application"
+   provider_name="ServiceNow"> 
+   <description>
+    Servicenow Hackathon 2017 - Team SNBoost
+	 </description>
+</plugin>

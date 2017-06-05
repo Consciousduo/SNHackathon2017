@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_processor">
+  <sys_processor action="INSERT_OR_UPDATE">
+    <active>true</active>
+    <class_name/>
+    <description>Processor for incident graph view page.</description>
+    <interactive>false</interactive>
+    <name>SNBoostProcessor</name>
+    <parameters/>
+    <params_endpoint/>
+    <path>snboost_processor</path>
+    <path_endpoint/>
+    <require_csrf>false</require_csrf>
+    <roles/>
+    <script><![CDATA[(function process(g_request, g_response, g_processor) {
+	
+	var validScriptInclude = ['SNBoostManager'];
+	
+	if (validScriptInclude.indexOf(String(g_request.getParameter('sysparm_processor'))) > -1) {
+		try {
+			var processor=new this[g_request.getParameter('sysparm_processor')](g_request);
+			var response=processor[g_request.getParameter('sysparm_name')]();
+			g_response.setContentType("text/html;charset=UTF-8");
+			g_processor.writeOutput(response);
+		} catch (e) {
+			gs.error(e);
+		}
+	}
+	
+})(g_request, g_response, g_processor);]]></script>
+    <sys_class_name>sys_processor</sys_class_name>
+    <sys_created_by>admin</sys_created_by>
+    <sys_created_on>2017-06-04 23:46:23</sys_created_on>
+    <sys_id>d4b6ee5b67033200e483cbb35685ef0b</sys_id>
+    <sys_mod_count>2</sys_mod_count>
+    <sys_name>SNBoostProcessor</sys_name>
+    <sys_package display_value="Global" source="global">global</sys_package>
+    <sys_policy/>
+    <sys_scope display_value="Global">global</sys_scope>
+    <sys_update_name>sys_processor_d4b6ee5b67033200e483cbb35685ef0b</sys_update_name>
+    <sys_updated_by>admin</sys_updated_by>
+    <sys_updated_on>2017-06-05 00:53:26</sys_updated_on>
+    <type>script</type>
+  </sys_processor>
+</record_update>

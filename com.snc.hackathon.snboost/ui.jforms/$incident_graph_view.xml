@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+<g:requires name="scripts/js_include_d3.js" includes="true"/>
+
+<style>
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+</style>
+
+<svg width="1440" height="900"></svg>
+
+<script>
+getJSONString();
+
+function RenderPage(jsonInputString) {
+    console.log("fuck" + jsonInputString);
+
+    var graph = JSON.parse(String(jsonInputString));
+    var sclectedId = [];
+
+    var svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+
+    var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+    var simulation = d3.forceSimulation()
+        .force("link", d3.forceLink().id(function(d) {
+            return d.id;
+        }).distance(function(d) {
+            return 80;
+        }))
+        .force("charge", d3.forceManyBody())
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+
+
+    var link = svg.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(graph.links)
+        .enter().append("line")
+        .attr("stroke-width", function(d) {
+            return Math.sqrt(d.value);
+        });
+
+    var node = svg.append("g")
+        .attr("class", "nodes")
+        .selectAll("circle")
+        .data(graph.nodes)
+        .enter().append("circle")
+        .attr("r", 10)
+        .attr("fill", function(d) {
+            return color(d.group);
+        })
+        .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+
+    node.append("title")
+        .text(function(d) {
+            return d.id;
+        });
+
+    simulation
+        .nodes(graph.nodes)
+        .on("tick", ticked);
+
+
+    simulation.force("link")
+        .links(graph.links);
+
+
+    function ticked() {
+        link
+            .attr("x1", function(d) {
+                return d.source.x;
+            })
+            .attr("y1", function(d) {
+                return d.source.y;
+            })
+            .attr("x2", function(d) {
+                return d.target.x;
+            })
+            .attr("y2", function(d) {
+                return d.target.y;
+            });
+
+        node
+            .attr("cx", function(d) {
+                return d.x;
+            })
+            .attr("cy", function(d) {
+                return d.y;
+            });
+    }
+
+    function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+
+        var index = sclectedId.indexOf(d.id);
+        if (index > -1) {
+            sclectedId.splice(index, 1);
+        } else {
+            sclectedId.push(d.id);
+        }
+
+        node
+            .attr("fill", function(d) {
+                var index = sclectedId.indexOf(d.id);
+                if (index > -1) {
+                    return d3.rgb(20, 20, 20);
+                } else {
+                    return color(d.group);
+                }
+            });
+    }
+
+    function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+    }
+
+    function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+    }
+}
+
+
+function getJSONString() {
+
+    var postdata = {
+        sysparm_processor: 'SNBoostManager',
+        sysparm_name: 'getResultJSONString'
+    };
+    var json = "";
+
+
+    jQuery.ajax({
+        type: 'POST',
+        url: 'snboost_processor.do',
+        data: postdata,
+        dataType: 'text',
+        success: function(data) {
+            RenderPage(data);
+        }
+    });
+}
+</script>
+
+</j:jelly>
